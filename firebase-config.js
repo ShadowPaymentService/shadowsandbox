@@ -1,6 +1,5 @@
-// firebase-config.js
 import { initializeApp } from "https://gstatic.com";
-import { getAuth, GoogleAuthProvider, GithubAuthProvider } from "https://gstatic.com";
+import { getAuth } from "https://gstatic.com";
 import { getFirestore } from "https://gstatic.com";
 
 const firebaseConfig = {
@@ -12,9 +11,6 @@ const firebaseConfig = {
     appId: "1:58218651704:web:8f42123496a37c768946cd"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
-export const githubProvider = new GithubAuthProvider();

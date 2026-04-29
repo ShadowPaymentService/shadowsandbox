@@ -1,39 +1,46 @@
-// Մոդալ պատուհանների կառավարում
-function openModal() { document.getElementById('createModal').style.display = 'flex'; }
-function closeModal() { document.getElementById('createModal').style.display = 'none'; }
-function toggleSettings() { 
-    const modal = document.getElementById('settingsModal');
-    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-}
+import { db, auth } from './firebase-config.js';
+import { collection, addDoc, query, where, onSnapshot } from "https://gstatic.com";
 
-// Պրոյեկտի ստեղծում
-function createProject() {
+// Պրոյեկտ ստեղծել և պահել Firestore-ում
+window.createProject = async () => {
     const name = document.getElementById('projectName').value;
     const type = document.getElementById('projectType').value;
-    
-    if(name === "") { alert("SYSTEM_ERROR: Name required"); return; }
+    const user = auth.currentUser;
 
-    const grid = document.getElementById('projectGrid');
-    const newProject = document.createElement('div');
-    newProject.className = 'project-card';
-    newProject.innerHTML = `
-        <h3>${name}</h3>
-        <p>Type: ${type.toUpperCase()}</p>
-        <button class="open-btn">INITIALIZING TERMINAL...</button>
-    `;
-    
-    grid.appendChild(newProject);
-    closeModal();
-    console.log(`Project ${name} created with type ${type}`);
-}
+    if (!user) return alert("Մուտք գործեք համակարգ!");
+    if (!name) return alert("Անունը դատարկ է");
 
-// Բաժինների փոփոխություն
-function showSection(section) {
-    document.getElementById('sectionTitle').innerText = section.toUpperCase() + "_LOGS";
-}
+    try {
+        await addDoc(collection(db, "projects"), {
+            uid: user.uid,
+            name: name,
+            type: type,
+            createdAt: new Date()
+        });
+        closeModal();
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    }
+};
 
-// Email Verification (Real concept)
-function verifyEmail() {
-    const email = document.getElementById('editEmail').value;
-    alert("Verification link sent to: " + email);
-}
+// Պրոյեկտների ավտոմատ թարմացում բազայից
+auth.onAuthStateChanged(user => {
+    if (user) {
+        const q = query(collection(db, "projects"), where("uid", "==", user.uid));
+        onSnapshot(q, (snapshot) => {
+            const grid = document.getElementById('projectGrid');
+            grid.innerHTML = ""; // Մաքրել հինը
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                grid.innerHTML += `
+                    <div class="project-card">
+                        <h3>${data.name}</h3>
+                        <p>Tech: ${data.type}</p>
+                        <button class="open-btn" onclick="openTerminal('${data.name}')">RUN TERMINAL</button>
+                    </div>`;
+            });
+        });
+    } else {
+        window.location.href = "index.html";
+    }
+});

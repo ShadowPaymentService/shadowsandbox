@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShadowSandBox | Beast Mode</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --dark-black: #050505;
+            --matrix-glow: rgba(0, 255, 65, 0.2);
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Fira Code', monospace; }
+        body { background-color: var(--dark-black); color: var(--neon-green); overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0, 255, 65, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 65, 0.05) 1px, transparent 1px); background-size: 30px 30px; z-index: -1; animation: move 10s linear infinite; }
+        @keyframes move { from { background-position: 0 0; } to { background-position: 0 1000px; } }
+        .auth-card { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--neon-green); padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px var(--matrix-glow); max-width: 450px; width: 90%; }
+        .glitch-title { font-size: 2.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 10px; position: relative; text-shadow: 2px 2px #ff0000, -2px -2px #0000ff; }
+        .subtitle { font-size: 0.9rem; opacity: 0.7; margin-bottom: 30px; }
+        .auth-options { display: flex; flex-direction: column; gap: 15px; }
+        .btn-hacker { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); padding: 15px; font-size: 1rem; cursor: pointer; border-radius: 5px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
+        .btn-hacker:hover { background: var(--neon-green); color: black; box-shadow: 0 0 20px var(--neon-green); font-weight: bold; }
+        .btn-hacker img { width: 20px; filter: drop-shadow(0 0 2px black); }
+        .terminal-text { margin-top: 20px; font-size: 0.8rem; color: #555; }
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="auth-card">
+        <div class="glitch-title">ShadowSandBox</div>
+        <p class="subtitle">Secure Environment Locked. Please Authenticate...</p>
+        <div class="auth-options">
+            <button id="googleLogin" class="btn-hacker">
+                <img src="https://gstatic.com" alt="">
+                Sign in with Google
+            </button>
+            <button id="githubLogin" class="btn-hacker">
+                <img src="https://githubassets.com" style="filter: invert(1);" alt="">
+                Sign in with GitHub
+            </button>
+            <hr style="border: 0.5px solid #222; margin: 10px 0;">
+            <button onclick="alert('Redirecting to Google Register...')" class="btn-hacker" style="font-size: 0.8rem; border-style: dashed;">Register with Google Account</button>
+            <button onclick="alert('Redirecting to GitHub Register...')" class="btn-hacker" style="font-size: 0.8rem; border-style: dashed;">Register with GitHub Account</button>
+        </div>
+        <div class="terminal-text">SYSTEM_STATUS: <span style="color: var(--neon-green);">WAITING_FOR_LOGIN</span><span class="blink">_</span></div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from "https://gstatic.com";
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "://firebaseapp.com",
+            projectId: "your-app-id",
+            storageBucket: "://appspot.com",
+            messagingSenderId: "xxxxxx",
+            appId: "xxxxxx"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+        const githubProvider = new GithubAuthProvider();
+        document.getElementById('googleLogin').onclick = async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                alert("Welcome, " + result.user.displayName);
+            } catch (error) { console.error(error); alert("Login Error: " + error.message); }
+        };
+        document.getElementById('githubLogin').onclick = async () => {
+            try {
+                const result = await signInWithPopup(auth, githubProvider);
+                alert("GitHub Auth Successful!");
+            } catch (error) { console.error(error); }
+        };
+    </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 import { initializeApp } from "https://gstatic.com";
-import { getAuth, onAuthStateChanged, signOut } from "https://gstatic.com";
+import { getAuth, onAuthStateChanged, signOut, sendEmailVerification, updateProfile } from "https://gstatic.com";
 import { getFirestore, collection, addDoc, query, where, onSnapshot, serverTimestamp } from "https://gstatic.com";
 
-// --- FIREBASE CONFIG (Enter your details.) ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
     apiKey: "AIzaSyDpxt8iUQBKODu1VvP4hPHl_LyJQKKvZSQ",
     authDomain: "codesandbox-8272e.firebaseapp.com",
@@ -16,18 +16,21 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 1. Ստուգել օգտատիրոջը
+let currentMode = 'new';
+
+// 1. Auth Listener
 onAuthStateChanged(auth, (user) => {
     if (user) {
         document.getElementById('userName').innerText = user.displayName || "Hacker_Active";
         document.getElementById('userAvatar').src = user.photoURL || "https://placeholder.com";
+        document.getElementById('userStatus').innerText = `verified: ${user.emailVerified}`;
         loadProjects(user.uid);
     } else {
         window.location.href = "index.html";
     }
 });
 
-// 2. Պրոյեկտների բեռնում Firestore-ից
+// 2. Load Projects from Firebase Firestore
 function loadProjects(uid) {
     const q = query(collection(db, "projects"), where("uid", "==", uid));
     onSnapshot(q, (snapshot) => {
@@ -39,61 +42,90 @@ function loadProjects(uid) {
             card.className = 'project-card';
             card.innerHTML = `
                 <h3>${data.name}</h3>
-                <p>Environment: ${data.type}</p>
-                <button class="open-btn" onclick="startTerminal('${data.name}')">EXECUTE_SHELL</button>
+                <p>Type: ${data.type}</p>
+                <button class="open-btn" onclick="startTerminal('${data.name}', ${data.isGithub})">EXECUTE_SHELL</button>
             `;
             grid.appendChild(card);
         });
     });
 }
 
-// 3. Պրոյեկտի ստեղծում
+// 3. Create/Clone Project
 document.getElementById('confirmCreate').onclick = async () => {
-    const name = document.getElementById('projectName').value;
-    const type = document.getElementById('projectType').value;
     const user = auth.currentUser;
+    let name, type, isGithub = false;
+
+    if (currentMode === 'git') {
+        const url = document.getElementById('githubRepoUrl').value;
+        if (!url.includes('github.com')) return alert("Invalid GitHub URL");
+        name = url.split('/').pop();
+        type = "GitHub Repository";
+        isGithub = true;
+    } else {
+        name = document.getElementById('projectName').value;
+        type = document.getElementById('projectType').value;
+    }
 
     if (name && user) {
         await addDoc(collection(db, "projects"), {
             uid: user.uid,
             name: name,
             type: type,
+            isGithub: isGithub,
             timestamp: serverTimestamp()
         });
-        document.getElementById('createModal').style.display = 'none';
-        document.getElementById('projectName').value = "";
-    } else {
-        alert("Enter project name!");
+        closeModal();
     }
 };
 
-// 4. Տերմինալի ֆունկցիա (Xterm.js)
-window.startTerminal = (name) => {
+// 4. Terminal Engine (Xterm.js)
+window.startTerminal = (name, isGit) => {
     const container = document.getElementById('terminal-container');
     container.style.display = 'block';
-    
-    // Մաքրել հին տերմինալը եթե կա
     document.getElementById('xterm-div').innerHTML = "";
     
-    const term = new Terminal({
-        cursorBlink: true,
-        fontFamily: 'Fira Code',
-        theme: { background: '#000', foreground: '#00ff41' }
-    });
-
+    const term = new Terminal({ cursorBlink: true, theme: { background: '#000', foreground: '#00ff41' } });
     term.open(document.getElementById('xterm-div'));
-    term.writeln(`\x1b[1;32m>>> Accessing ShadowSandBox...\x1b[0m`);
-    term.writeln(`\x1b[1;32m>>> Connecting to ${name} container...\x1b[0m`);
+    
+    term.writeln(`\x1b[1;32m>>> Accessing ShadowSandBox Environment...\x1b[0m`);
+    if(isGit) {
+        term.writeln(`\x1b[1;33m>>> git clone https://github.com{name}.git\x1b[0m`);
+        term.writeln(`Receiving objects: 100% (1024/1024), done.`);
+    }
+    term.writeln(`\x1b[1;32m>>> Container ${name} is ONLINE.\x1b[0m`);
     term.write('\r\n$ ');
 
     term.onData(data => {
-        if (data === '\r') {
-            term.write('\r\n\x1b[1;31mError: Execution requires server-side pty-node.\x1b[0m\r\n$ ');
-        } else {
-            term.write(data);
-        }
+        if (data === '\r') term.write('\r\n\x1b[31mPermission Denied: Root access required.\x1b[0m\r\n$ ');
+        else term.write(data);
     });
 };
 
-// 5. Logout
+// 5. UI Helpers
+window.switchTab = (mode) => {
+    currentMode = mode;
+    document.getElementById('new-project-tab').style.display = mode === 'new' ? 'block' : 'none';
+    document.getElementById('github-tab').style.display = mode === 'git' ? 'block' : 'none';
+    document.getElementById('tabNew').className = mode === 'new' ? 'active' : '';
+    document.getElementById('tabGit').className = mode === 'git' ? 'active' : '';
+};
+
+window.openCreateModal = () => document.getElementById('createModal').style.display = 'flex';
+window.closeModal = () => document.getElementById('createModal').style.display = 'none';
+window.openSettings = () => document.getElementById('settingsModal').style.display = 'flex';
+
+// 6. Settings Logic (Email/Username)
+document.getElementById('verifyBtn').onclick = async () => {
+    const user = auth.currentUser;
+    if (user) {
+        await sendEmailVerification(user);
+        alert("Verification email sent to: " + user.email);
+    }
+};
+
+// 7. Logout
 document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+window.showSection = (section) => {
+    document.getElementById('sectionTitle').innerText = `SYSTEM_${section.toUpperCase()}`;
+};

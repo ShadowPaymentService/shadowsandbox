@@ -7,8 +7,8 @@ window.createProject = async () => {
     const type = document.getElementById('projectType').value;
     const user = auth.currentUser;
 
-    if (!user) return alert("Մուտք գործեք համակարգ!");
-    if (!name) return alert("Անունը դատարկ է");
+    if (!user) return alert("Log in to the system!");
+    if (!name) return alert("Name is empty.");
 
     try {
         await addDoc(collection(db, "projects"), {
@@ -23,13 +23,13 @@ window.createProject = async () => {
     }
 };
 
-// Պրոյեկտների ավտոմատ թարմացում բազայից
+// Automatic update of projects from the database
 auth.onAuthStateChanged(user => {
     if (user) {
         const q = query(collection(db, "projects"), where("uid", "==", user.uid));
         onSnapshot(q, (snapshot) => {
             const grid = document.getElementById('projectGrid');
-            grid.innerHTML = ""; // Մաքրել հինը
+            grid.innerHTML = ""; // Clear old
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 grid.innerHTML += `

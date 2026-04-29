@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en/AM">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShadowSandBox | Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://googleapis.com" rel="stylesheet">
+</head>
+<body class="hacker-theme">
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar">
+        <div class="logo">ShadowSandBox</div>
+        <div class="user-profile" id="userProfile">
+            <img id="userAvatar" src="https://placeholder.com" alt="Avatar">
+            <span id="userName">Hacker_User</span>
+        </div>
+        <ul class="nav-links">
+            <li class="active" onclick="showSection('recent')">1) Recent</li>
+            <li onclick="showSection('credits')">2) Credits</li>
+            <li onclick="toggleSettings()">3) Settings</li>
+            <li onclick="showSection('free-credits')">4) Free Credits</li>
+            <li>5) Support</li>
+            <li onclick="showSection('projects')">6) Your Project</li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <h2 id="sectionTitle">RECENT_PROJECTS</h2>
+            <button class="create-btn" onclick="openModal()">+ CREATE NEW PROJECT</button>
+        </header>
+
+        <div id="projectGrid" class="project-grid">
+            <!-- Այստեղ կհայտնվեն ստեղծված պրոյեկտները -->
+            <div class="project-card">
+                <h3>example_project</h3>
+                <p>Type: HTML/CSS</p>
+                <button class="open-btn">OPEN TERMINAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Project Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <h3>INITIALIZE_NEW_PROJECT</h3>
+            <input type="text" id="projectName" placeholder="Enter project name...">
+            <select id="projectType">
+                <option value="html-css">HTML/CSS Web Development</option>
+                <option value="nodejs">Node.js</option>
+                <option value="python">Python</option>
+                <option value="jupyter">Jupyter Labs</option>
+                <option value="docker">Docker</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">ABORT</button>
+                <button class="btn-confirm" onclick="createProject()">CREATE SHADOW_SANDBOX_PROJECT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3>USER_SETTINGS</h3>
+            <label>Username:</label>
+            <input type="text" id="editUsername" placeholder="New username">
+            <label>Email Address:</label>
+            <input type="email" id="editEmail" placeholder="New email">
+            <button class="btn-confirm" onclick="verifyEmail()">VERIFY & SAVE</button>
+            <button class="btn-cancel" onclick="toggleSettings()">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

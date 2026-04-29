@@ -5,37 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShadowSandBox | Terminal Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
-    <!-- Google Fonts & Xterm CSS -->
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="https://jsdelivr.net" />
+    <style>
+        /* Լրացուցիչ Tab-երի ոճավորում */
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .tab-buttons button { background: none; border: 1px solid var(--green); color: var(--green); cursor: pointer; padding: 5px 10px; font-family: 'Fira Code'; }
+        .tab-buttons button.active { background: var(--green); color: black; }
+    </style>
 </head>
 <body class="hacker-theme">
 
+    <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo">SHADOW_SANDBOX</div>
         <div class="user-profile">
-            <img id="userAvatar" src="https://placeholder.com" alt="Hacker">
-            <span id="userName">loading...</span>
+            <img id="userAvatar" src="https://placeholder.com" alt="H">
+            <div>
+                <span id="userName">loading...</span><br>
+                <small id="userStatus" style="color: gray; font-size: 10px;">verified: false</small>
+            </div>
         </div>
         <ul class="nav-links">
-            <li class="active">1) Recent</li>
-            <li>2) Credits</li>
-            <li onclick="document.getElementById('settingsModal').style.display='flex'">3) Settings</li>
-            <li>4) Free Credits</li>
+            <li class="active" onclick="showSection('recent')">1) Recent</li>
+            <li onclick="showSection('credits')">2) Credits</li>
+            <li onclick="openSettings()">3) Settings</li>
+            <li onclick="showSection('free-credits')">4) Free Credits</li>
             <li>5) Support</li>
-            <li>6) Your Project</li>
+            <li onclick="showSection('projects')">6) Your Project</li>
         </ul>
-        <button id="logoutBtn" style="margin-top: auto; background: none; border: 1px solid red; color: red; cursor: pointer; padding: 5px;">LOGOUT</button>
+        <button id="logoutBtn" style="margin-top: auto; background: none; border: 1px solid #ff0000; color: #ff0000; cursor: pointer; padding: 8px;">TERMINATE_SESSION</button>
     </div>
 
+    <!-- Main Content -->
     <div class="main-content">
         <header>
-            <h2>SYSTEM_DASHBOARD_V1.0</h2>
-            <button class="create-btn" onclick="document.getElementById('createModal').style.display='flex'">+ INITIALIZE PROJECT</button>
+            <h2 id="sectionTitle">SYSTEM_DASHBOARD</h2>
+            <button class="create-btn" onclick="openCreateModal()">+ INITIALIZE PROJECT</button>
         </header>
 
         <div id="projectGrid" class="project-grid">
-            <!-- Պրոյեկտները կհայտնվեն այստեղ Firebase-ից -->
+            <!-- Պրոյեկտները կհայտնվեն այստեղ -->
         </div>
     </div>
 
@@ -43,16 +53,28 @@
     <div id="createModal" class="modal">
         <div class="modal-content">
             <h3>NEW_DEPLOYMENT</h3>
-            <input type="text" id="projectName" placeholder="Project name...">
-            <select id="projectType">
-                <option value="html-css">HTML/CSS/JS Web</option>
-                <option value="nodejs">Node.js Environment</option>
-                <option value="python">Python Interpreter</option>
-                <option value="docker">Docker Container</option>
-            </select>
+            <div class="tab-buttons">
+                <button id="tabNew" class="active" onclick="switchTab('new')">Local Project</button>
+                <button id="tabGit" onclick="switchTab('git')">GitHub Import</button>
+            </div>
+
+            <div id="new-project-tab">
+                <input type="text" id="projectName" placeholder="Project name...">
+                <select id="projectType">
+                    <option value="html-css">HTML/CSS/JS Development</option>
+                    <option value="nodejs">Node.js Engine</option>
+                    <option value="python">Python Lab</option>
+                </select>
+            </div>
+
+            <div id="github-tab" style="display:none;">
+                <input type="text" id="githubRepoUrl" placeholder="https://github.com">
+                <p style="font-size: 10px; color: #00ff41; margin-top: 5px;">ShadowShell will clone this repository</p>
+            </div>
+
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="document.getElementById('createModal').style.display='none'">ABORT</button>
-                <button class="btn-confirm" id="confirmCreate">CREATE_PROJECT</button>
+                <button class="btn-cancel" onclick="closeModal()">ABORT</button>
+                <button class="btn-confirm" id="confirmCreate">EXECUTE_CREATE</button>
             </div>
         </div>
     </div>
@@ -60,24 +82,25 @@
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
-            <h3>USER_CONFIG</h3>
+            <h3>USER_CONFIG_OVERRIDE</h3>
+            <label style="font-size: 10px;">Update Username:</label>
             <input type="text" id="newUsername" placeholder="New Username">
+            <label style="font-size: 10px;">Update Email:</label>
             <input type="email" id="newEmail" placeholder="New Email">
-            <button class="btn-confirm" onclick="alert('Verification Sent!')">VERIFY EMAIL</button>
-            <button class="btn-cancel" onclick="document.getElementById('settingsModal').style.display='none'">CLOSE</button>
+            <button class="btn-confirm" id="verifyBtn" style="width: 100%; margin-bottom: 5px;">SEND VERIFICATION</button>
+            <button class="btn-cancel" onclick="document.getElementById('settingsModal').style.display='none'" style="width: 100%;">CLOSE</button>
         </div>
     </div>
 
-    <!-- Terminal Window (Hidden by default) -->
+    <!-- Terminal -->
     <div id="terminal-container" style="display:none; position:fixed; bottom:0; right:0; width: calc(100% - 250px); height:300px; background:#000; border-top:2px solid #00ff41; z-index: 100;">
         <div style="background: #111; padding: 5px; display: flex; justify-content: space-between; border-bottom: 1px solid #333;">
-            <span style="font-size: 12px; margin-left: 10px;">SHADOW_TERMINAL v2.4</span>
-            <button onclick="document.getElementById('terminal-container').style.display='none'" style="background: red; border: none; color: white; cursor: pointer;">X</button>
+            <span style="font-size: 12px; margin-left: 10px;">SHADOW_TERMINAL_V2.4</span>
+            <button onclick="document.getElementById('terminal-container').style.display='none'" style="background: red; border: none; color: white; cursor: pointer; padding: 0 10px;">X</button>
         </div>
         <div id="xterm-div" style="height: 270px;"></div>
     </div>
 
-    <!-- Xterm.js Logic -->
     <script src="https://jsdelivr.net"></script>
     <script type="module" src="dashboard.js"></script>
 </body>

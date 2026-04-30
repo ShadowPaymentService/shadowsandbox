@@ -35,4 +35,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=YOUR-FIREBASE-APP-ID-HERE`
 
 **IF THERE ARE ANY PROBLEMS🚨, | 🙌 | CREATE A TICKET TO MY DISCORD SERVER FOR HELP YOU 🆘**
 
-(CLICK TO JOIN)[https://bit.ly/ShadowCraftMC]
+[CLICK TO JOIN](https://bit.ly/ShadowCraftMC)
+
+
+[![discord members](https://discord-live-members-count-badge.vercel.app/api/discord-members?guildId=https://bit.ly/ShadowCraftMC&color=27ae60&label=Users&scale=2)](https://bit.ly/ShadowCraftMC)

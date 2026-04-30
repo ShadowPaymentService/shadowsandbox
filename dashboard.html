@@ -1,108 +1,159 @@
 <!DOCTYPE html>
-<html lang="hy">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShadowSandBox | Terminal Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css">
+    <title>ShadowSandBox | Dashboard</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="https://jsdelivr.net" />
     <style>
-        /* Լրացուցիչ Tab-երի ոճավորում */
-        .tab-buttons { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; }
-        .tab-buttons button { background: none; border: 1px solid var(--green); color: var(--green); cursor: pointer; padding: 5px 10px; font-family: 'Fira Code'; }
-        .tab-buttons button.active { background: var(--green); color: black; }
+        :root { --neon: #00ff41; --bg: #0a0a0a; --panel: #111; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--neon); font-family: 'Fira Code', monospace; display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar { width: 260px; border-right: 1px solid var(--neon); padding: 20px; display: flex; flex-direction: column; background: #050505; }
+        .logo-section { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+        .logo-section img { width: 35px; filter: drop-shadow(0 0 5px var(--neon)); }
+        
+        .user-box { display: flex; align-items: center; gap: 10px; padding-bottom: 20px; border-bottom: 1px solid #222; margin-bottom: 20px; }
+        .user-box img { width: 40px; border-radius: 50%; border: 1px solid var(--neon); }
+
+        .nav-links { list-style: none; }
+        .nav-links li { padding: 12px; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
+        .nav-links li:hover, .nav-links li.active { background: rgba(0, 255, 65, 0.05); color: white; border-left: 2px solid var(--neon); }
+
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .create-btn { background: var(--neon); color: black; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--neon); }
+
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .project-card { background: var(--panel); border: 1px solid #222; padding: 20px; border-radius: 5px; }
+        .open-btn { background: transparent; border: 1px solid var(--neon); color: var(--neon); width: 100%; margin-top: 15px; padding: 8px; cursor: pointer; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #000; border: 1px solid var(--neon); padding: 30px; width: 400px; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--neon); }
+
+        #terminal-box { display: none; position: fixed; bottom: 0; right: 0; width: calc(100% - 260px); height: 300px; background: #000; border-top: 2px solid var(--neon); z-index: 999; }
     </style>
 </head>
-<body class="hacker-theme">
+<body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <img src="https://ibb.co/XkfyRkh5" alt="ShadowSandBox Logo" class="main-logo">
-        <div class="logo">SHADOW_SANDBOX</div>
-        <div class="user-profile">
-            <img id="userAvatar" src="https://placeholder.com" alt="H">
-            <div>
-                <span id="userName">loading...</span><br>
-                <small id="userStatus" style="color: gray; font-size: 10px;">verified: false</small>
-            </div>
+    <aside class="sidebar">
+        <div class="logo-section">
+            <img src="https://ibb.co" alt="">
+            <span>SHADOW_SB</span>
+        </div>
+        <div class="user-box">
+            <img id="uAvatar" src="" alt="">
+            <span id="uName">Loading...</span>
         </div>
         <ul class="nav-links">
-            <li class="active" onclick="showSection('recent')">1) Recent</li>
-            <li onclick="showSection('credits')">2) Credits</li>
-            <li onclick="openSettings()">3) Settings</li>
-            <li onclick="showSection('free-credits')">4) Free Credits</li>
-            <li>5) Support</li>
-            <li onclick="showSection('projects')">6) Your Project</li>
+            <li class="active">1) Recent</li>
+            <li>2) Credits</li>
+            <li>3) Settings</li>
+            <li>4) Free Credits</li>
+            <li>5) Your Projects</li>
         </ul>
-        <button id="logoutBtn" style="margin-top: auto; background: none; border: 1px solid #ff0000; color: #ff0000; cursor: pointer; padding: 8px;">TERMINATE_SESSION</button>
-    </div>
+        <button id="logout" style="margin-top: auto; color: red; background: none; border: 1px solid red; padding: 5px; cursor: pointer;">LOGOUT</button>
+    </aside>
 
-    <!-- Main Content -->
-    <div class="main-content">
+    <main class="main-content">
         <header>
-            <h2 id="sectionTitle">SYSTEM_DASHBOARD</h2>
-            <button class="create-btn" onclick="openCreateModal()">+ INITIALIZE PROJECT</button>
+            <h2>ENVIRONMENT_LOGS</h2>
+            <button class="create-btn" onclick="document.getElementById('cModal').style.display='flex'">+ CREATE PROJECT</button>
         </header>
+        <div id="projectGrid" class="project-grid"></div>
+    </main>
 
-        <div id="projectGrid" class="project-grid">
-            <!-- Պրոյեկտները կհայտնվեն այստեղ -->
-        </div>
-    </div>
-
-    <!-- Create Project Modal -->
-    <div id="createModal" class="modal">
+    <div id="cModal" class="modal">
         <div class="modal-content">
-            <h3>NEW_DEPLOYMENT</h3>
-            <div class="tab-buttons">
-                <button id="tabNew" class="active" onclick="switchTab('new')">Local Project</button>
-                <button id="tabGit" onclick="switchTab('git')">GitHub Import</button>
-            </div>
-
-            <div id="new-project-tab">
-                <input type="text" id="projectName" placeholder="Project name...">
-                <select id="projectType">
-                    <option value="html-css">HTML/CSS/JS Development</option>
-                    <option value="nodejs">Node.js Engine</option>
-                    <option value="python">Python Lab</option>
-                </select>
-            </div>
-
-            <div id="github-tab" style="display:none;">
-                <input type="text" id="githubRepoUrl" placeholder="https://github.com">
-                <p style="font-size: 10px; color: #00ff41; margin-top: 5px;">ShadowShell will clone this repository</p>
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">ABORT</button>
-                <button class="btn-confirm" id="confirmCreate">EXECUTE_CREATE</button>
-            </div>
+            <h3>NEW_PROJECT</h3>
+            <input type="text" id="pName" placeholder="Project name...">
+            <select id="pType">
+                <option value="HTML/CSS">HTML/CSS/JS</option>
+                <option value="Node.js">Node.js</option>
+                <option value="Python">Python</option>
+            </select>
+            <button class="create-btn" style="width:100%" id="confirmCreate">CONFIRM_DEPLOY</button>
+            <button onclick="document.getElementById('cModal').style.display='none'" style="color:gray; border:none; background:none; margin-top:10px; cursor:pointer;">CANCEL</button>
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <h3>USER_CONFIG_OVERRIDE</h3>
-            <label style="font-size: 10px;">Update Username:</label>
-            <input type="text" id="newUsername" placeholder="New Username">
-            <label style="font-size: 10px;">Update Email:</label>
-            <input type="email" id="newEmail" placeholder="New Email">
-            <button class="btn-confirm" id="verifyBtn" style="width: 100%; margin-bottom: 5px;">SEND VERIFICATION</button>
-            <button class="btn-cancel" onclick="document.getElementById('settingsModal').style.display='none'" style="width: 100%;">CLOSE</button>
+    <div id="terminal-box">
+        <div style="background:#111; padding:5px 15px; display:flex; justify-content:space-between; font-size:12px;">
+            <span>SHADOW_SHELL_V1.0</span>
+            <button onclick="document.getElementById('terminal-box').style.display='none'" style="color:red; background:none; border:none; cursor:pointer;">X</button>
         </div>
-    </div>
-
-    <!-- Terminal -->
-    <div id="terminal-container" style="display:none; position:fixed; bottom:0; right:0; width: calc(100% - 250px); height:300px; background:#000; border-top:2px solid #00ff41; z-index: 100;">
-        <div style="background: #111; padding: 5px; display: flex; justify-content: space-between; border-bottom: 1px solid #333;">
-            <span style="font-size: 12px; margin-left: 10px;">SHADOW_TERMINAL_V2.4</span>
-            <button onclick="document.getElementById('terminal-container').style.display='none'" style="background: red; border: none; color: white; cursor: pointer; padding: 0 10px;">X</button>
-        </div>
-        <div id="xterm-div" style="height: 270px;"></div>
+        <div id="terminal-div" style="height:270px;"></div>
     </div>
 
     <script src="https://jsdelivr.net"></script>
-    <script type="module" src="dashboard.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getAuth, onAuthStateChanged, signOut } from "https://gstatic.com";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, serverTimestamp } from "https://gstatic.com";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDpxt8iUQBKODu1VvP4hPHl_LyJQKKvZSQ",
+            authDomain: "codesandbox-8272e.firebaseapp.com",
+            projectId: "codesandbox-8272e",
+            storageBucket: "codesandbox-8272e.firebasestorage.app",
+            messagingSenderId: "58218651704",
+            appId: "1:58218651704:web:8f42123496a37c768946cd",
+            measurementId: "G-GV7W182MBF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('uName').innerText = user.displayName;
+                document.getElementById('uAvatar').src = user.photoURL;
+                loadProjects(user.uid);
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        function loadProjects(uid) {
+            const q = query(collection(db, "projects"), where("uid", "==", uid));
+            onSnapshot(q, (snapshot) => {
+                const grid = document.getElementById('projectGrid');
+                grid.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    grid.innerHTML += `<div class="project-card">
+                        <h4>${data.name}</h4><p style="font-size:10px;">${data.type}</p>
+                        <button class="open-btn" onclick="openTerm('${data.name}')">OPEN_SHELL</button>
+                    </div>`;
+                });
+            });
+        }
+
+        document.getElementById('confirmCreate').onclick = async () => {
+            const name = document.getElementById('pName').value;
+            const type = document.getElementById('pType').value;
+            if (name && auth.currentUser) {
+                await addDoc(collection(db, "projects"), { uid: auth.currentUser.uid, name, type, createdAt: serverTimestamp() });
+                document.getElementById('cModal').style.display = 'none';
+                document.getElementById('pName').value = "";
+            }
+        };
+
+        window.openTerm = (name) => {
+            document.getElementById('terminal-box').style.display = 'block';
+            document.getElementById('terminal-div').innerHTML = "";
+            const term = new Terminal({ cursorBlink: true, theme: { background: '#000', foreground: '#00ff41' } });
+            term.open(document.getElementById('terminal-div'));
+            term.writeln(`\x1b[1;32m>>> ACCESSING_CONTAINER: ${name}...\x1b[0m`);
+            term.write('\r\n$ ');
+        };
+
+        document.getElementById('logout').onclick = () => signOut(auth);
+    </script>
 </body>
 </html>

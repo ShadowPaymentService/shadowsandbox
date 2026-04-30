@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  Discord,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

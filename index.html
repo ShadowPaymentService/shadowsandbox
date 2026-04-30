@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShadowSandBox | Auth</title>
+    <title>ShadowSandBox | Authentication</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
         :root { --neon: #00ff41; --bg: #050505; }
         body { background: var(--bg); color: var(--neon); font-family: 'Fira Code', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .auth-card { background: rgba(255,255,255,0.02); border: 1px solid var(--neon); padding: 40px; border-radius: 10px; text-align: center; box-shadow: 0 0 25px rgba(0,255,65,0.15); width: 350px; }
-        .main-logo { width: 100px; filter: drop-shadow(0 0 10px var(--neon)); margin-bottom: 20px; animation: pulse 2s infinite; }
+        .auth-card { background: rgba(255,255,255,0.02); border: 1px solid var(--neon); padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 0 30px rgba(0,255,65,0.2); width: 100%; max-width: 380px; }
+        .main-logo { width: 110px; filter: drop-shadow(0 0 10px var(--neon)); margin-bottom: 20px; animation: pulse 2s infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .glitch-title { font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 30px; font-weight: bold; }
-        .btn-hacker { background: transparent; border: 1px solid var(--neon); color: var(--neon); padding: 12px; width: 100%; margin: 10px 0; cursor: pointer; transition: 0.3s; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .glitch-title { font-size: 1.6rem; font-weight: bold; letter-spacing: 5px; margin-bottom: 30px; text-shadow: 0 0 5px var(--neon); }
+        .btn-hacker { background: transparent; border: 1px solid var(--neon); color: var(--neon); padding: 14px; width: 100%; margin: 10px 0; cursor: pointer; transition: 0.3s; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-hacker:hover { background: var(--neon); color: black; box-shadow: 0 0 20px var(--neon); }
-        .btn-hacker img { width: 20px; }
-        #loading { display: none; margin-top: 15px; font-size: 11px; color: white; }
+        .btn-hacker img { width: 22px; }
+        #status { font-size: 10px; margin-top: 15px; color: #555; }
     </style>
 </head>
 <body>
 
     <div class="auth-card">
-        <img src="https://ibb.co/XkfyRkh5" alt="Logo" class="main-logo">
+        <img src="https://i.ibb.co/LhDQ7hLg/file-000000003640724693d7c35c508e7205.png" alt="Shadow Logo" class="main-logo">
         <div class="glitch-title">SHADOW_SANDBOX</div>
         
         <button class="btn-hacker" id="googleBtn">
-            <img src="https://gstatic.com" alt=""> LOGIN_WITH_GOOGLE
+            <img src="https://gstatic.com" alt=""> Sign in with Google
         </button>
         <button class="btn-hacker" id="githubBtn">
-            <img src="https://githubassets.com" style="filter: invert(1);" alt=""> LOGIN_WITH_GITHUB
+            <img src="https://githubassets.com" style="filter: invert(1);" alt=""> Sign in with GitHub
         </button>
 
-        <div id="loading">EXECUTING_SYSTEM_AUTH...</div>
+        <div id="status">_READY_FOR_HANDSHAKE_</div>
     </div>
 
     <script type="module">
@@ -39,33 +39,31 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from "https://gstatic.com";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDpxt8iUQBKODu1VvP4hPHl_LyJQKKvZSQ",
-            authDomain: "codesandbox-8272e.firebaseapp.com",
-            projectId: "codesandbox-8272e",
-            storageBucket: "codesandbox-8272e.firebasestorage.app",
-            messagingSenderId: "58218651704",
-            appId: "1:58218651704:web:8f42123496a37c768946cd",
-            measurementId: "G-GV7W182MBF"
+           apiKey: "AIzaSyDpxt8iUQBKODu1VvP4hPHl_LyJQKKvZSQ",
+           authDomain: "codesandbox-8272e.firebaseapp.com",
+           projectId: "codesandbox-8272e",
+           storageBucket: "codesandbox-8272e.firebasestorage.app",
+           messagingSenderId: "58218651704",
+           appId: "1:58218651704:web:8f42123496a37c768946cd",
+           measurementId: "G-GV7W182MBF"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const loading = document.getElementById('loading');
 
-        async function handleAuth(provider) {
-            loading.style.display = 'block';
+        async function login(provider) {
             try {
-                await signInWithPopup(auth, provider);
+                const result = await signInWithPopup(auth, provider);
+                console.log("Logged in:", result.user);
                 window.location.href = "dashboard.html";
             } catch (error) {
-                alert("Auth Error: " + error.message);
-            } finally {
-                loading.style.display = 'none';
+                console.error(error);
+                alert("LOGIN_FAILED: " + error.message);
             }
         }
 
-        document.getElementById('googleBtn').onclick = () => handleAuth(new GoogleAuthProvider());
-        document.getElementById('githubBtn').onclick = () => handleAuth(new GithubAuthProvider());
+        document.getElementById('googleBtn').onclick = () => login(new GoogleAuthProvider());
+        document.getElementById('githubBtn').onclick = () => login(new GithubAuthProvider());
     </script>
 </body>
 </html>

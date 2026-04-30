@@ -38,4 +38,23 @@ NEXT_PUBLIC_FIREBASE_APP_ID=YOUR-FIREBASE-APP-ID-HERE`
 [CLICK TO JOIN](https://bit.ly/ShadowCraftMC)
 
 
-[![discord members](https://discord-live-members-count-badge.vercel.app/api/discord-members?guildId=1486870807085977710&color=27ae60&label=Users&scale=2)](1486870177206370376)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ShadowCraftMC Chat</title>
+</head>
+<body>
+    <h1>Բարի գալուստ ShadowCraftMC չատ</h1>
+    <p>Discord-ի չատը կհայտնվի էկրանի ներքևի աջ անկյունում:</p>
+
+    <!-- Ձեր տրամադրած WidgetBot կոդը -->
+    <script src='https://cdn.jsdelivr.net/npm/@widgetbot/crate@3' async defer>
+        new Crate({
+            server: '1486870177206370376', // ShadowCraftMC
+            channel: '1486870807085977710' // #💬・chat
+        })
+    </script>
+</body>
+</html>

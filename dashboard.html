@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hy">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,86 +7,98 @@
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="https://jsdelivr.net" />
     <style>
-        :root { --neon: #00ff41; --bg: #0a0a0a; --panel: #111; }
+        :root { --neon: #00ff41; --bg: #0a0a0a; --side: #050505; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg); color: var(--neon); font-family: 'Fira Code', monospace; display: flex; height: 100vh; overflow: hidden; }
         
-        .sidebar { width: 260px; border-right: 1px solid var(--neon); padding: 20px; display: flex; flex-direction: column; background: #050505; }
-        .logo-section { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
-        .logo-section img { width: 35px; filter: drop-shadow(0 0 5px var(--neon)); }
+        /* Sidebar */
+        .sidebar { width: 260px; border-right: 1px solid var(--neon); padding: 25px; display: flex; flex-direction: column; background: var(--side); }
+        .logo-box { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; font-weight: bold; }
+        .logo-box img { width: 35px; filter: drop-shadow(0 0 5px var(--neon)); }
         
-        .user-box { display: flex; align-items: center; gap: 10px; padding-bottom: 20px; border-bottom: 1px solid #222; margin-bottom: 20px; }
-        .user-box img { width: 40px; border-radius: 50%; border: 1px solid var(--neon); }
+        .profile { display: flex; align-items: center; gap: 10px; padding: 15px 0; border-bottom: 1px solid #222; margin-bottom: 25px; }
+        .profile img { width: 40px; border-radius: 50%; border: 1px solid var(--neon); }
 
-        .nav-links { list-style: none; }
-        .nav-links li { padding: 12px; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
-        .nav-links li:hover, .nav-links li.active { background: rgba(0, 255, 65, 0.05); color: white; border-left: 2px solid var(--neon); }
+        .nav { list-style: none; }
+        .nav li { padding: 12px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; border-left: 2px solid transparent; }
+        .nav li:hover, .nav li.active { background: rgba(0, 255, 65, 0.05); border-left: 2px solid var(--neon); color: #fff; }
 
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .create-btn { background: var(--neon); color: black; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--neon); }
+        /* Main */
+        .content { flex: 1; padding: 40px; overflow-y: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #111; padding-bottom: 20px; }
+        .btn-create { background: var(--neon); color: black; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--neon); text-transform: uppercase; }
 
-        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .project-card { background: var(--panel); border: 1px solid #222; padding: 20px; border-radius: 5px; }
-        .open-btn { background: transparent; border: 1px solid var(--neon); color: var(--neon); width: 100%; margin-top: 15px; padding: 8px; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+        .card { background: #111; border: 1px solid #222; padding: 20px; border-radius: 4px; transition: 0.3s; position: relative; }
+        .card:hover { border-color: var(--neon); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .card h4 { margin-bottom: 10px; color: #fff; }
+        .card p { font-size: 0.7rem; color: #666; }
+        .run-btn { background: transparent; border: 1px solid var(--neon); color: var(--neon); width: 100%; margin-top: 15px; padding: 8px; cursor: pointer; font-weight: bold; }
 
         /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #000; border: 1px solid var(--neon); padding: 30px; width: 400px; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--neon); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-body { background: #000; border: 1px solid var(--neon); padding: 30px; width: 400px; box-shadow: 0 0 30px var(--neon); }
+        input, select { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #333; color: var(--neon); outline: none; }
+        input:focus { border-color: var(--neon); }
 
-        #terminal-box { display: none; position: fixed; bottom: 0; right: 0; width: calc(100% - 260px); height: 300px; background: #000; border-top: 2px solid var(--neon); z-index: 999; }
+        /* Terminal */
+        #term-window { display: none; position: fixed; bottom: 0; right: 0; width: calc(100% - 260px); height: 320px; background: #000; border-top: 2px solid var(--neon); z-index: 999; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="logo-section">
-            <img src="https://ibb.co" alt="">
-            <span>SHADOW_SB</span>
+        <div class="logo-box">
+            <img src="https://i.ibb.co/LhDQ7hLg/file-000000003640724693d7c35c508e7205.png" alt="">
+            <span>SHADOW_SANDBOX</span>
         </div>
-        <div class="user-box">
-            <img id="uAvatar" src="" alt="">
-            <span id="uName">Loading...</span>
+        <div class="profile">
+            <img id="uPic" src="https://placeholder.com" alt="">
+            <span id="uName">Hacker_User</span>
         </div>
-        <ul class="nav-links">
-            <li class="active">1) Recent</li>
-            <li>2) Credits</li>
-            <li>3) Settings</li>
-            <li>4) Free Credits</li>
-            <li>5) Your Projects</li>
+        <ul class="nav">
+            <li class="active">1) RECENT_LOGS</li>
+            <li>2) SYSTEM_CREDITS</li>
+            <li onclick="alert('Settings: Coming soon')">3) CONFIG_SETTINGS</li>
+            <li>4) FREE_LICENSE</li>
+            <li>5) DEPLOYED_PROJECTS</li>
         </ul>
-        <button id="logout" style="margin-top: auto; color: red; background: none; border: 1px solid red; padding: 5px; cursor: pointer;">LOGOUT</button>
+        <button id="exit" style="margin-top: auto; color: red; border: 1px solid red; background: none; padding: 8px; cursor: pointer;">TERMINATE_AUTH</button>
     </aside>
 
-    <main class="main-content">
+    <main class="content">
         <header>
-            <h2>ENVIRONMENT_LOGS</h2>
-            <button class="create-btn" onclick="document.getElementById('cModal').style.display='flex'">+ CREATE PROJECT</button>
+            <h2>PROJECT_ENVIRONMENT</h2>
+            <button class="btn-create" onclick="document.getElementById('m').style.display='flex'">+ NEW DEPLOYMENT</button>
         </header>
-        <div id="projectGrid" class="project-grid"></div>
+        <div id="grid" class="grid">
+            <!-- Projects from Firebase -->
+        </div>
     </main>
 
-    <div id="cModal" class="modal">
-        <div class="modal-content">
-            <h3>NEW_PROJECT</h3>
+    <!-- Create Modal -->
+    <div id="m" class="modal">
+        <div class="modal-body">
+            <h3 style="margin-bottom:10px;">INITIALIZE_CONTAINER</h3>
             <input type="text" id="pName" placeholder="Project name...">
             <select id="pType">
-                <option value="HTML/CSS">HTML/CSS/JS</option>
-                <option value="Node.js">Node.js</option>
-                <option value="Python">Python</option>
+                <option value="Web Development (HTML/CSS)">HTML/CSS/JS Lab</option>
+                <option value="Node.js Engine">Node.js Shell</option>
+                <option value="Python Python 3.11">Python Environment</option>
+                <option value="Docker Instance">Docker Container</option>
             </select>
-            <button class="create-btn" style="width:100%" id="confirmCreate">CONFIRM_DEPLOY</button>
-            <button onclick="document.getElementById('cModal').style.display='none'" style="color:gray; border:none; background:none; margin-top:10px; cursor:pointer;">CANCEL</button>
+            <button class="btn-create" style="width:100%" id="saveP">EXECUTE_CREATE</button>
+            <button onclick="document.getElementById('m').style.display='none'" style="color:gray; background:none; border:none; margin-top:15px; cursor:pointer; width:100%;">[ABORT_ACTION]</button>
         </div>
     </div>
 
-    <div id="terminal-box">
-        <div style="background:#111; padding:5px 15px; display:flex; justify-content:space-between; font-size:12px;">
-            <span>SHADOW_SHELL_V1.0</span>
-            <button onclick="document.getElementById('terminal-box').style.display='none'" style="color:red; background:none; border:none; cursor:pointer;">X</button>
+    <!-- Terminal -->
+    <div id="term-window">
+        <div style="background:#111; padding:8px 20px; display:flex; justify-content:space-between; font-size:12px; border-bottom:1px solid #222;">
+            <span>SHADOW_SHELL_V2.0_STABLE</span>
+            <button onclick="document.getElementById('term-window').style.display='none'" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">[X]</button>
         </div>
-        <div id="terminal-div" style="height:270px;"></div>
+        <div id="term-container" style="height:280px;"></div>
     </div>
 
     <script src="https://jsdelivr.net"></script>
@@ -96,64 +108,78 @@
         import { getFirestore, collection, addDoc, query, where, onSnapshot, serverTimestamp } from "https://gstatic.com";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDpxt8iUQBKODu1VvP4hPHl_LyJQKKvZSQ",
-            authDomain: "codesandbox-8272e.firebaseapp.com",
-            projectId: "codesandbox-8272e",
-            storageBucket: "codesandbox-8272e.firebasestorage.app",
-            messagingSenderId: "58218651704",
-            appId: "1:58218651704:web:8f42123496a37c768946cd",
-            measurementId: "G-GV7W182MBF"
+           apiKey: "AIzaSyDpxt8iUQBKODu1VvP4hPHl_LyJQKKvZSQ",
+           authDomain: "codesandbox-8272e.firebaseapp.com",
+           projectId: "codesandbox-8272e",
+           storageBucket: "codesandbox-8272e.firebasestorage.app",
+           messagingSenderId: "58218651704",
+           appId: "1:58218651704:web:8f42123496a37c768946cd",
+           measurementId: "G-GV7W182MBF"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Security Check
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('uName').innerText = user.displayName;
-                document.getElementById('uAvatar').src = user.photoURL;
-                loadProjects(user.uid);
+                document.getElementById('uName').innerText = user.displayName || "Hacker";
+                document.getElementById('uPic').src = user.photoURL || "";
+                loadData(user.uid);
             } else {
                 window.location.href = "index.html";
             }
         });
 
-        function loadProjects(uid) {
+        // Load Projects
+        function loadData(uid) {
             const q = query(collection(db, "projects"), where("uid", "==", uid));
-            onSnapshot(q, (snapshot) => {
-                const grid = document.getElementById('projectGrid');
-                grid.innerHTML = "";
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    grid.innerHTML += `<div class="project-card">
-                        <h4>${data.name}</h4><p style="font-size:10px;">${data.type}</p>
-                        <button class="open-btn" onclick="openTerm('${data.name}')">OPEN_SHELL</button>
-                    </div>`;
+            onSnapshot(q, (snaps) => {
+                const g = document.getElementById('grid');
+                g.innerHTML = "";
+                snaps.forEach(doc => {
+                    const d = doc.data();
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerHTML = `<h4>${d.name}</h4><p>${d.type}</p><button class="run-btn" onclick="openTerm('${d.name}')">EXECUTE_SHELL</button>`;
+                    g.appendChild(div);
                 });
             });
         }
 
-        document.getElementById('confirmCreate').onclick = async () => {
+        // Create Project
+        document.getElementById('saveP').onclick = async () => {
             const name = document.getElementById('pName').value;
             const type = document.getElementById('pType').value;
             if (name && auth.currentUser) {
-                await addDoc(collection(db, "projects"), { uid: auth.currentUser.uid, name, type, createdAt: serverTimestamp() });
-                document.getElementById('cModal').style.display = 'none';
+                await addDoc(collection(db, "projects"), { 
+                    uid: auth.currentUser.uid, 
+                    name: name, 
+                    type: type, 
+                    time: serverTimestamp() 
+                });
+                document.getElementById('m').style.display = 'none';
                 document.getElementById('pName').value = "";
             }
         };
 
+        // Terminal logic
         window.openTerm = (name) => {
-            document.getElementById('terminal-box').style.display = 'block';
-            document.getElementById('terminal-div').innerHTML = "";
+            document.getElementById('term-window').style.display = 'block';
+            document.getElementById('term-container').innerHTML = "";
             const term = new Terminal({ cursorBlink: true, theme: { background: '#000', foreground: '#00ff41' } });
-            term.open(document.getElementById('terminal-div'));
-            term.writeln(`\x1b[1;32m>>> ACCESSING_CONTAINER: ${name}...\x1b[0m`);
+            term.open(document.getElementById('term-container'));
+            term.writeln(`\x1b[1;32m>>> ESTABLISHING CONNECTION TO: ${name}...\x1b[0m`);
+            term.writeln(`\x1b[1;32m>>> SYSTEM_READY. SHELL_ACTIVE.\x1b[0m`);
             term.write('\r\n$ ');
+            term.onData(d => {
+                if (d === '\r') term.write('\r\n$ ');
+                else term.write(d);
+            });
         };
 
-        document.getElementById('logout').onclick = () => signOut(auth);
+        document.getElementById('exit').onclick = () => signOut(auth);
     </script>
 </body>
 </html>

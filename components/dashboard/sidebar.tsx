@@ -26,7 +26,7 @@ const menuItems = [
   { icon: Gift, label: 'Free Credits', href: '/dashboard/credits' },
   { icon: Coins, label: 'Credits', href: '/dashboard/billing' },
   { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
-  { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
+  { icon: Discord, label: 'Settings', href: '/dashboard/discord-live' },
 ]
 
 export function DashboardSidebar() {

@@ -38,11 +38,4 @@ NEXT_PUBLIC_FIREBASE_APP_ID=YOUR-FIREBASE-APP-ID-HERE`
 [CLICK TO JOIN](https://bit.ly/ShadowCraftMC)
 
 
-[![discord members](https://discord-live-members-count-badge.vercel.app/api/discord-members?guildId=https://bit.ly/ShadowCraftMC&color=27ae60&label=Users&scale=2)](https://bit.ly/ShadowCraftMC)
-
-<script src='https://cdn.jsdelivr.net/npm/@widgetbot/crate@3' async defer>
-    new Crate({
-        server: '1486870177206370376', // ShadowCraftMC
-        channel: '1486870807085977710' // #💬・chat
-    })
-</script>
+[![discord members](https://discord-live-members-count-badge.vercel.app/api/discord-members?guildId=1486870807085977710&color=27ae60&label=Users&scale=2)](1486870177206370376)

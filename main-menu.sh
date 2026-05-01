@@ -55,8 +55,8 @@ echo -e "|  _ <  | |___  | |_| |  | |   ___) |   | |   | |___  |  _ <      | |__
 echo -e "|_| \_\ |_____|  \____| |___| |____/    |_|   |_____| |_| \_\     |_____|  \___/   \____| |___| |_| \_|"
 echo -e "${NC}"
 
-type_text "${YELLOW}" ">>> SHADOWSANDBOX PANEL <<<"
-type_text "${RED}" "{CREATE ACCOUNT OR LOGIN YOUR ACCOUNT AND INSTALL WEBSITE LIKE }"
+type_text ">>> SHADOWSANDBOX PANEL <<<"
+type_text "{CREATE ACCOUNT OR LOGIN YOUR ACCOUNT AND INSTALL WEBSITE LIKE }"
 echo ""
 
 # =========================

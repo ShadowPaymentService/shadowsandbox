@@ -25,13 +25,13 @@ type_text() {
 }
 
 # =========================
-# REAL PROGRESS BAR
+# PROGRESS BAR
 # =========================
 progress_bar() {
   echo -ne "${YELLOW}["
   for i in {1..20}; do
     echo -ne "#"
-    sleep 0.1
+    sleep 0.05
   done
   echo -e "] 100%${NC}"
 }
@@ -44,21 +44,21 @@ hash_pass() {
 }
 
 # =========================
-# BANNER
+# STEP 1 BANNER
 # =========================
 clear
 echo -e "${CYAN}"
-echo "███████╗██╗  ██╗ █████╗ ██████╗  ██████╗ ██╗    ██╗███████╗███████╗ █████╗ ███╗   ██╗██████╗ "
-echo "██╔════╝██║  ██║██╔══██╗██╔══██╗██╔═══██╗██║    ██║██╔════╝██╔════╝██╔══██╗████╗  ██║██╔══██╗"
-echo "███████╗███████║███████║██████╔╝██║   ██║██║ █╗ ██║███████╗█████╗  ███████║██╔██╗ ██║██║  ██║"
-echo -e "${RED}"
-echo "╚════██║██╔══██║██╔══██║██╔══██╗██║   ██║██║███╗██║╚════██║██╔══╝  ██╔══██║██║╚██╗██║██║  ██║"
-echo "███████║██║  ██║██║  ██║██████╔╝╚██████╔╝╚███╔███╔╝███████║███████╗██║  ██║██║ ╚████║██████╔╝"
-echo "╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝  ╚══╝╚══╝ ╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ "
+echo "███████╗██╗  ██╗ █████╗ ██████╗  ██████╗ ███████╗ █████╗ ███╗   ██╗██████╗ "
+echo "██╔════╝██║  ██║██╔══██╗██╔══██╗██╔═══██╗██╔════╝██╔══██╗████╗  ██║██╔══██╗"
+echo "███████╗███████║███████║██████╔╝██║   ██║█████╗  ███████║██╔██╗ ██║██║  ██║"
+echo "╚════██║██╔══██║██╔══██║██╔══██╗██║   ██║██╔══╝  ██╔══██║██║╚██╗██║██║  ██║"
+echo "███████║██║  ██║██║  ██║██║  ██║╚██████╔╝███████╗██║  ██║██║ ╚████║██████╔╝"
+echo "╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ "
 echo -e "${NC}"
 
-type_text ">>> SHADOWSANDBOX INSTALLER CONTROL PANEL <<<"
-sleep 0.5
+type_text ">>> SHADOWSANDBOX PANEL <<<"
+type_text "{CREATE ACCOUNT OR LOGIN YOUR ACCOUNT FOR INSTALL WEBSITE LIKE CODESANDBOX}"
+echo ""
 
 # =========================
 # REGISTER
@@ -81,7 +81,7 @@ register() {
 # =========================
 login() {
   echo ""
-  type_text "[+] Login Required"
+  type_text "[+] Login"
   read -p "Username: " user
   read -s -p "Password: " pass
   echo ""
@@ -89,10 +89,10 @@ login() {
   hashed=$(hash_pass "$pass")
 
   if grep -q "$user:$hashed" $USER_FILE 2>/dev/null; then
-    echo -e "${GREEN}[✔] Access Granted${NC}"
+    echo -e "${GREEN}[✔] Login Success${NC}"
     return 0
   else
-    echo -e "${RED}[✖] Access Denied${NC}"
+    echo -e "${RED}[✖] Wrong Credentials${NC}"
     return 1
   fi
 }
@@ -100,26 +100,39 @@ login() {
 # =========================
 # AUTH MENU
 # =========================
-echo ""
-type_text "1) Login"
-type_text "2) Register"
+type_text "1) Register"
+type_text "2) Login"
 echo ""
 
 read -p "Select: " auth
 
-if [ "$auth" == "2" ]; then
+if [ "$auth" == "1" ]; then
   register
 fi
 
 login || exit
 
 # =========================
-# MAIN MENU LOOP
+# STEP 2 BANNER (CONTROL PANEL)
+# =========================
+clear
+echo -e "${GREEN}"
+echo "███████╗██╗  ██╗ █████╗ ██████╗  ██████╗ ███████╗ █████╗ ███╗   ██╗██████╗ "
+echo "██╔════╝██║  ██║██╔══██╗██╔══██╗██╔═══██╗██╔════╝██╔══██╗████╗  ██║██╔══██╗"
+echo "███████╗███████║███████║██████╔╝██║   ██║█████╗  ███████║██╔██╗ ██║██║  ██║"
+echo "╚════██║██╔══██║██╔══██║██╔══██╗██║   ██║██╔══╝  ██╔══██║██║╚██╗██║██║  ██║"
+echo "███████║██║  ██║██║  ██║██║  ██║╚██████╔╝███████╗██║  ██║██║ ╚████║██████╔╝"
+echo "╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ "
+echo -e "${NC}"
+
+type_text ">>> ShadowSandBox Control Center Own By <<< ShadowCraftMC >>>"
+sleep 0.5
+
+# =========================
+# MAIN MENU
 # =========================
 while true; do
-
   echo ""
-  type_text "========== MAIN PANEL =========="
   type_text "1) Website v1 (Auto Install)"
   type_text "2) Cloudflare Setup"
   type_text "3) Exit"
@@ -127,9 +140,6 @@ while true; do
 
   read -p "Choose option: " option
 
-  # =========================
-  # INSTALL WEBSITE
-  # =========================
   if [ "$option" == "1" ]; then
 
     read -p "Enter domain (example.com): " domain
@@ -163,28 +173,23 @@ while true; do
     pm2 save > /dev/null 2>&1
 
     echo ""
-    echo -e "${GREEN}[✔] WEBSITE INSTALLED SUCCESSFULLY${NC}"
+    echo -e "${GREEN}[✔] WEBSITE INSTALLED${NC}"
     echo -e "${CYAN}Open: http://$domain:3000${NC}"
 
-  # =========================
-  # CLOUDFLARE
-  # =========================
   elif [ "$option" == "2" ]; then
 
     clear
     type_text ">>> CLOUDFLARE SETUP <<<"
     echo ""
-
-    type_text "[1] Go to dash.cloudflare.com"
-    type_text "[2] Add your domain"
-    type_text "[3] Set nameservers"
-    type_text "[4] Add DNS A record"
-
+    type_text "1) dash.cloudflare.com"
+    type_text "2) Add site"
+    type_text "3) Set nameservers"
+    type_text "4) Add DNS A -> VPS IP"
     echo ""
     echo -e "${GREEN}[✔] Done${NC}"
 
   elif [ "$option" == "3" ]; then
-    echo "Bye 😎"
+    echo "Bye 😎 | Thanks For Using Our Tools🔥"
     exit
   fi
 

@@ -56,8 +56,8 @@ echo "███████║██║  ██║██║  ██║██║ 
 echo "╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ "
 echo -e "${NC}"
 
-type_text ">>> SHADOWSANDBOX PANEL <<<"
-type_text "{CREATE ACCOUNT OR LOGIN YOUR ACCOUNT FOR INSTALL WEBSITE LIKE CODESANDBOX}"
+type_text "${YELLOW}" ">>> SHADOWSANDBOX PANEL <<<"
+type_text "${RED}" "{CREATE ACCOUNT OR LOGIN YOUR ACCOUNT AND INSTALL WEBSITE LIKE }"
 echo ""
 
 # =========================
